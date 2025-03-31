@@ -11,3 +11,8 @@ final class CartSuccessState extends CartState {
   final List<ProductDataModel> cartItems;
   CartSuccessState({required this.cartItems});
 }
+
+final class CartProductItemRemovedActionState extends CartActionState {
+  final ProductDataModel? productDataModel;
+  CartProductItemRemovedActionState({this.productDataModel});
+}

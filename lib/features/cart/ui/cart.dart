@@ -35,7 +35,18 @@ class _CartState extends State<Cart> {
       ),
       body: BlocConsumer<CartBloc, CartState>(
         bloc: cartBloc,
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is CartProductItemRemovedActionState) {
+            final productDataModel = state.productDataModel!.name;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text('Produto $productDataModel removido do carrinho!'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        },
         listenWhen: (previous, current) => current is CartActionState,
         buildWhen: (previous, current) => current is! CartActionState,
         builder: (context, state) {
@@ -43,13 +54,24 @@ class _CartState extends State<Cart> {
             case const (CartSuccessState):
               final cartSuccessState = state as CartSuccessState;
 
-              return ListView.builder(
-                  itemCount: cartSuccessState.cartItems.length,
-                  itemBuilder: (context, index) {
-                    return CartTileWidget(
-                        cartBloc: cartBloc,
-                        productDataModel: cartSuccessState.cartItems[index]);
-                  });
+              return cartSuccessState.cartItems.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: cartSuccessState.cartItems.length,
+                      itemBuilder: (context, index) {
+                        return CartTileWidget(
+                            cartBloc: cartBloc,
+                            productDataModel:
+                                cartSuccessState.cartItems[index]);
+                      })
+                  : Center(
+                      child: Text(
+                        'Carrinho vazio',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
             default:
               return const SizedBox();
           }
