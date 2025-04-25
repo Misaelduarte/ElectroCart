@@ -59,9 +59,8 @@ class _WishListState extends State<WishList> {
                       itemCount: cartSuccessState.wishlistItems.length,
                       itemBuilder: (context, index) {
                         return WishlistTileWidget(
-                            wishlistBloc: cartBloc,
-                            productDataModel:
-                                cartSuccessState.wishlistItems[index]);
+                            bloc: cartBloc,
+                            product: cartSuccessState.wishlistItems[index]);
                       })
                   : Center(
                       child: Text(

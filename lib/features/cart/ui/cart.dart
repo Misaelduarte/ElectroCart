@@ -59,9 +59,8 @@ class _CartState extends State<Cart> {
                       itemCount: cartSuccessState.cartItems.length,
                       itemBuilder: (context, index) {
                         return CartTileWidget(
-                            cartBloc: cartBloc,
-                            productDataModel:
-                                cartSuccessState.cartItems[index]);
+                            bloc: cartBloc,
+                            product: cartSuccessState.cartItems[index]);
                       })
                   : Center(
                       child: Text(
