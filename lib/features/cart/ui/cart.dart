@@ -69,6 +69,7 @@ class _CartState extends State<Cart> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade500,
                         ),
                       ),
                     );
