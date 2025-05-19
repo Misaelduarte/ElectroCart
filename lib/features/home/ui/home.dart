@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_app/auth/bloc/auth_bloc.dart';
+import 'package:flutter_bloc_app/auth/bloc/auth_event.dart';
 import 'package:flutter_bloc_app/features/cart/ui/cart.dart';
 import 'package:flutter_bloc_app/features/home/bloc/home_bloc.dart';
 import 'package:flutter_bloc_app/features/home/ui/product_tile_widget.dart';
 import 'package:flutter_bloc_app/features/wishlist/ui/wishlist.dart';
+import 'package:flutter_bloc_app/shared/widgets/gradient_app_bar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -60,40 +63,28 @@ class _HomeState extends State<Home> {
           case const (HomeLoadedSuccessState):
             final homeLoadedSuccessState = state as HomeLoadedSuccessState;
             return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  'Eletronics App',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
+              backgroundColor: Colors.grey.shade100,
+              appBar: GradientAppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined),
+                  color: Colors.white,
+                  onPressed: () {
+                    homeBloc.add(HomeCartButtonNavigateEvent());
+                  },
                 ),
-                backgroundColor: Colors.deepPurple.shade700,
+                title: 'Shopiverse',
                 actions: [
                   IconButton(
+                    icon: const Icon(Icons.logout),
+                    color: Colors.white,
                     onPressed: () {
-                      homeBloc.add(HomeWishListButtonNavigateEvent());
+                      context.read<AuthBloc>().add(AuthSignOutRequested());
                     },
-                    icon: Icon(Icons.favorite_border),
-                    style: ButtonStyle(
-                      iconColor: WidgetStateProperty.all(Colors.white),
-                    ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      homeBloc.add(HomeCartButtonNavigateEvent());
-                    },
-                    icon: Icon(
-                      Icons.shopping_bag_outlined,
-                    ),
-                    style: ButtonStyle(
-                      iconColor: WidgetStateProperty.all(Colors.white),
-                    ),
-                  )
                 ],
               ),
               body: ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   itemCount: homeLoadedSuccessState.products.length,
                   itemBuilder: (context, index) {
                     return ProductTileWidget(

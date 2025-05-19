@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_app/utils/currency_helper.dart';
 
 class ProductCard extends StatelessWidget {
   final String imageUrl;
@@ -59,7 +60,7 @@ class ProductCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "R\$ ${price.toStringAsFixed(2)}",
+                  CurrencyHelper.format(price),
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),

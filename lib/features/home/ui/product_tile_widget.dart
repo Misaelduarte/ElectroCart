@@ -1,82 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_app/features/home/bloc/home_bloc.dart';
 import 'package:flutter_bloc_app/features/home/models/home_product_data_model.dart';
+import 'package:flutter_bloc_app/utils/currency_helper.dart';
 
 class ProductTileWidget extends StatelessWidget {
   final ProductDataModel productDataModel;
   final HomeBloc homeBloc;
-  const ProductTileWidget(
-      {super.key, required this.productDataModel, required this.homeBloc});
+
+  const ProductTileWidget({
+    super.key,
+    required this.productDataModel,
+    required this.homeBloc,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black),
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey.shade300,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      clipBehavior: Clip.antiAlias,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            height: 200,
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(productDataModel.imageUrl)),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Image.network(
+              productDataModel.imageUrl,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            productDataModel.name,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // título
+                Text(
+                  productDataModel.name,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  productDataModel.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      CurrencyHelper.format(productDataModel.price),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                                // fontSize: 30,
+                              ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.favorite_border),
+                          color: Colors.grey[700],
+                          onPressed: () => homeBloc.add(
+                            HomeProductWishListButtonClickedEvent(
+                              clickedProduct: productDataModel,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          Text(productDataModel.description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              )),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "R\$ ${productDataModel.price.toString()}",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      homeBloc.add(HomeProductWishListButtonClickedEvent(
-                          clickedProduct: productDataModel));
-                    },
-                    icon: Icon(Icons.favorite_border),
-                    style: ButtonStyle(
-                      iconColor: WidgetStateProperty.all(Colors.black),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      homeBloc.add(HomeProductCartButtonClickedEvent(
-                          clickedProduct: productDataModel));
-                    },
-                    icon: Icon(
-                      Icons.shopping_bag_outlined,
-                    ),
-                    style: ButtonStyle(
-                      iconColor: WidgetStateProperty.all(Colors.black),
-                    ),
-                  )
-                ],
-              )
-            ],
           ),
         ],
       ),

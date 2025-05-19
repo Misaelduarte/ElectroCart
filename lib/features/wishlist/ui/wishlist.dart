@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_app/features/wishlist/bloc/wishlist_bloc.dart';
 import 'package:flutter_bloc_app/features/wishlist/ui/wishlist_tile_widget.dart';
+import 'package:flutter_bloc_app/shared/widgets/gradient_app_bar.dart';
 
 class WishList extends StatefulWidget {
   const WishList({super.key});
@@ -21,17 +22,8 @@ class _WishListState extends State<WishList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          'Lista de desejos',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        backgroundColor: Colors.deepPurple.shade700,
+      appBar: GradientAppBar(
+        title: 'Favoritos',
       ),
       body: BlocConsumer<WishlistBloc, WishlistState>(
         bloc: cartBloc,

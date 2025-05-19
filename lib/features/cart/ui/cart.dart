@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_app/features/cart/bloc/cart_bloc.dart';
 import 'package:flutter_bloc_app/features/cart/ui/cart_tile_widget.dart';
+import 'package:flutter_bloc_app/shared/widgets/gradient_app_bar.dart';
 
 class Cart extends StatefulWidget {
   const Cart({super.key});
@@ -21,17 +22,14 @@ class _CartState extends State<Cart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          'Carrinho',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+      appBar: GradientAppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Colors.white,
+          onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Colors.deepPurple.shade700,
+        title: 'Carrinho',
+        actions: const [],
       ),
       body: BlocConsumer<CartBloc, CartState>(
         bloc: cartBloc,
