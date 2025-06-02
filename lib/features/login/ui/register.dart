@@ -82,7 +82,18 @@ class RegisterPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            BlocBuilder<AuthBloc, AuthState>(
+                            BlocConsumer<AuthBloc, AuthState>(
+                              listener: (ctx, state) => {
+                                if (state is AuthSignupError)
+                                  {
+                                    ScaffoldMessenger.of(ctx).showSnackBar(
+                                      SnackBar(
+                                        content: Text(state.message),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    )
+                                  }
+                              },
                               builder: (ctx, state) {
                                 final loading = state is AuthLoading;
                                 return ElevatedButton(

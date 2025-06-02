@@ -93,7 +93,20 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            BlocBuilder<AuthBloc, AuthState>(
+                            BlocConsumer<AuthBloc, AuthState>(
+                              listener: (ctx, state) {
+                                if (state is AuthAuthenticated) {
+                                  Navigator.pushReplacementNamed(ctx, '/');
+                                }
+                                if (state is AuthSignError) {
+                                  ScaffoldMessenger.of(ctx).showSnackBar(
+                                    SnackBar(
+                                      content: Text(state.message),
+                                      backgroundColor: Colors.redAccent,
+                                    ),
+                                  );
+                                }
+                              },
                               builder: (ctx, state) {
                                 final loading = state is AuthLoading;
                                 return ElevatedButton(
@@ -142,7 +155,9 @@ class LoginPage extends StatelessWidget {
                               child: const Text(
                                 'Create an account',
                                 style: TextStyle(
-                                    decoration: TextDecoration.underline),
+                                  decoration: TextDecoration.underline,
+                                  color: Colors.black54,
+                                ),
                               ),
                             ),
                           ],

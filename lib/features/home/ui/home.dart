@@ -1,107 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_app/auth/bloc/auth_bloc.dart';
-import 'package:flutter_bloc_app/auth/bloc/auth_event.dart';
-import 'package:flutter_bloc_app/features/cart/ui/cart.dart';
+import 'package:flutter_bloc_app/data/repositories/product_repository.dart';
 import 'package:flutter_bloc_app/features/home/bloc/home_bloc.dart';
 import 'package:flutter_bloc_app/features/home/ui/product_tile_widget.dart';
-import 'package:flutter_bloc_app/features/wishlist/ui/wishlist.dart';
 import 'package:flutter_bloc_app/shared/widgets/gradient_app_bar.dart';
+import 'package:flutter_bloc_app/auth/bloc/auth_bloc.dart';
+import 'package:flutter_bloc_app/auth/bloc/auth_event.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) {
+        return HomeBloc(repository: ProductRepository())
+          ..add(HomeInitialEvent());
+      },
+      child: const HomeView(),
+    );
+  }
 }
 
-class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    homeBloc.add(HomeInitialEvent());
-    super.initState();
-  }
+class HomeView extends StatelessWidget {
+  const HomeView({super.key});
 
-  final HomeBloc homeBloc = HomeBloc();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
-      bloc: homeBloc,
-      listenWhen: (previous, current) => current is HomeActionState,
-      buildWhen: (previous, current) => current is! HomeActionState,
-      listener: (context, state) {
-        if (state is HomeNavigateToCartPageActionState) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Cart()));
-        } else if (state is HomeNavigateToWishListPageActionState) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => WishList()));
-        } else if (state is HomeProductItemWishListedActionState) {
-          ScaffoldMessenger.of(context).showSnackBar(
+      listenWhen: (_, curr) => curr is HomeActionState,
+      buildWhen: (_, curr) => curr is! HomeActionState,
+      listener: (ctx, state) {
+        if (state is HomeProductItemWishListedActionState) {
+          ScaffoldMessenger.of(ctx).showSnackBar(
             const SnackBar(
-              content: Text('Produto adicionado a Lista de Desejos'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else if (state is HomeProductItemCartActionState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Produto adicionado ao carrinho'),
-              duration: Duration(seconds: 2),
-            ),
+                content: Text('Produto adicionado à Lista de Desejos')),
           );
         }
       },
-      builder: (context, state) {
-        switch (state.runtimeType) {
-          case const (HomeLoadingState):
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          case const (HomeLoadedSuccessState):
-            final homeLoadedSuccessState = state as HomeLoadedSuccessState;
-            return Scaffold(
-              backgroundColor: Colors.grey.shade100,
-              appBar: GradientAppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.shopping_bag_outlined),
+      builder: (ctx, state) {
+        if (state is HomeLoadingState) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (state is HomeLoadedSuccessState) {
+          return Scaffold(
+            backgroundColor: Colors.grey.shade100,
+            appBar: GradientAppBar(
+              title: 'Shopiverse',
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.logout),
                   color: Colors.white,
                   onPressed: () {
-                    homeBloc.add(HomeCartButtonNavigateEvent());
+                    context.read<AuthBloc>().add(AuthSignOutRequested());
                   },
                 ),
-                title: 'Shopiverse',
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.logout),
-                    color: Colors.white,
-                    onPressed: () {
-                      context.read<AuthBloc>().add(AuthSignOutRequested());
-                    },
-                  ),
-                ],
-              ),
-              body: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  itemCount: homeLoadedSuccessState.products.length,
-                  itemBuilder: (context, index) {
-                    return ProductTileWidget(
-                        homeBloc: homeBloc,
-                        productDataModel:
-                            homeLoadedSuccessState.products[index]);
-                  }),
-            );
-          case const (HomeErrorState):
-            return const Scaffold(
-              body: Center(
-                child: Text('Error'),
-              ),
-            );
-          default:
-            return SizedBox();
+              ],
+            ),
+            body: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              itemCount: state.products.length,
+              itemBuilder: (context, i) {
+                final p = state.products[i];
+                return ProductTileWidget(
+                  homeBloc: context.read<HomeBloc>(),
+                  productDataModel: p,
+                );
+              },
+            ),
+          );
         }
+
+        return const Scaffold(
+          body: Center(child: Text('Erro ao carregar')),
+        );
       },
     );
   }

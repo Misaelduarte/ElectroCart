@@ -23,13 +23,7 @@ class _CartState extends State<Cart> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.white,
-          onPressed: () => Navigator.pop(context),
-        ),
         title: 'Carrinho',
-        actions: const [],
       ),
       body: BlocConsumer<CartBloc, CartState>(
         bloc: cartBloc,

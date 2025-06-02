@@ -66,7 +66,6 @@ class ProductTileWidget extends StatelessWidget {
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700,
-                                // fontSize: 30,
                               ),
                     ),
                     Row(

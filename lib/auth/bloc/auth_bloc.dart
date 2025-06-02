@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../data/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -30,14 +28,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await _repo.signIn(email: event.email, pass: event.pass);
         if (user != null) {
-          print('user: ${user.toString()}');
           emit(AuthAuthenticated(user.uid));
         } else {
           emit(AuthUnauthenticated());
         }
-      } catch (e) {
-        print(e.toString());
-        emit(AuthError(e.toString()));
+      } on FirebaseAuthException catch (e) {
+        final msg = _mapFirebaseAuthErrorToMessage(e.code);
+        emit(AuthSignError(msg));
+        emit(AuthUnauthenticated());
+      } catch (_) {
+        emit(AuthSignError('Unknown authentication error.'));
         emit(AuthUnauthenticated());
       }
     });
@@ -51,8 +51,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } else {
           emit(AuthUnauthenticated());
         }
-      } catch (e) {
-        emit(AuthError(e.toString()));
+      } on FirebaseAuthException catch (e) {
+        final msg = _mapFirebaseAuthErrorToMessage(e.code);
+        emit(AuthSignupError(msg));
+        emit(AuthUnauthenticated());
+      } catch (_) {
+        emit(AuthSignupError('Unknown signup error.'));
         emit(AuthUnauthenticated());
       }
     });
@@ -72,6 +76,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         } catch (_) {}
       }
     });
+  }
+
+  String _mapFirebaseAuthErrorToMessage(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return 'Invalid email address.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'user-not-found':
+        return 'No user found with that email.';
+      case 'user-disabled':
+        return 'User account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'email-already-in-use':
+        return 'This email is already in use.';
+      case 'operation-not-allowed':
+        return 'This operation is not allowed.';
+      case 'weak-password':
+        return 'The password is too weak.';
+      case 'invalid-credential':
+        return 'The provided credentials are invalid or have expired.';
+      default:
+        return 'Authentication error: $code';
+    }
   }
 
   @override

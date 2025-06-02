@@ -16,7 +16,12 @@ class AuthAuthenticated extends AuthState {
 
 class AuthUnauthenticated extends AuthState {}
 
-class AuthError extends AuthState {
+class AuthSignError extends AuthState {
   final String message;
-  AuthError(this.message);
+  AuthSignError(this.message);
+}
+
+class AuthSignupError extends AuthState {
+  final String message;
+  AuthSignupError(this.message);
 }
